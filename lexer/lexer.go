@@ -33,21 +33,33 @@ func (l *Lexer) NextToken() token.Token {
 
 	switch l.ch {
 	case '=':
-		tok = NewToken(token.ASSIGN, l.ch)
+		tok = newToken(token.ASSIGN, l.ch)
 	case '+':
-		tok = NewToken(token.PLUS, l.ch)
-	case ',':
-		tok = NewToken(token.COMMA, l.ch)
+		tok = newToken(token.PLUS, l.ch)
+	case '-':
+		tok = newToken(token.MINUS, l.ch)
+	case '!':
+		tok = newToken(token.BANG, l.ch)
+	case '/':
+		tok = newToken(token.SLASH, l.ch)
+	case '*':
+		tok = newToken(token.ASTERISK, l.ch)
+	case '<':
+		tok = newToken(token.LT, l.ch)
+	case '>':
+		tok = newToken(token.GT, l.ch)
 	case ';':
-		tok = NewToken(token.SEMICOLON, l.ch)
+		tok = newToken(token.SEMICOLON, l.ch)
+	case ',':
+		tok = newToken(token.COMMA, l.ch)
 	case '(':
-		tok = NewToken(token.LPAREN, l.ch)
+		tok = newToken(token.LPAREN, l.ch)
 	case ')':
-		tok = NewToken(token.RPAREN, l.ch)
+		tok = newToken(token.RPAREN, l.ch)
 	case '{':
-		tok = NewToken(token.LBRACE, l.ch)
+		tok = newToken(token.LBRACE, l.ch)
 	case '}':
-		tok = NewToken(token.RBRACE, l.ch)
+		tok = newToken(token.RBRACE, l.ch)
 	case 0:
 		tok.Type = token.EOF
 		tok.Literal = ""
@@ -61,7 +73,7 @@ func (l *Lexer) NextToken() token.Token {
 			tok.Type = token.INT
 			return tok
 		} else {
-			tok = NewToken(token.ILLEGAL, l.ch)
+			tok = newToken(token.ILLEGAL, l.ch)
 		}
 	}
 
@@ -103,6 +115,6 @@ func (l *Lexer) EatWhitespace() {
 	}
 }
 
-func NewToken(tokenType token.TokenType, ch byte) token.Token {
+func newToken(tokenType token.TokenType, ch byte) token.Token {
 	return token.Token{Type: tokenType, Literal: string(ch)}
 }

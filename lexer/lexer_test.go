@@ -14,6 +14,8 @@ let add = fn(x, y) {
 };
 
 let result = add(five, ten);
+!-/*5;
+5 < 10 > 5;
  `
 
 	tests := []struct {
@@ -56,6 +58,18 @@ let result = add(five, ten);
 		{token.IDENT, "ten"},
 		{token.RPAREN, ")"},
 		{token.SEMICOLON, ";"},
+		{token.BANG, "!"},
+		{token.MINUS, "-"},
+		{token.SLASH, "/"},
+		{token.ASTERISK, "*"},
+		{token.INT, "5"},
+		{token.SEMICOLON, ";"},
+		{token.INT, "5"},
+		{token.LT, "<"},
+		{token.INT, "10"},
+		{token.GT, ">"},
+		{token.INT, "5"},
+		{token.SEMICOLON, ";"},
 		{token.EOF, ""},
 	}
 
@@ -63,7 +77,7 @@ let result = add(five, ten);
 
 	for i, tt := range tests {
 		tok := l.NextToken()
-		t.Logf("tests[%d] token type got=%q, token literal got=%q", i, tok.Type, tok.Literal)
+
 		if tok.Type != tt.expectedTokenType {
 			t.Fatalf("tests[%d] - token type wrong. expected=%q, got=%q", i, tt.expectedTokenType, tok.Type)
 		}
