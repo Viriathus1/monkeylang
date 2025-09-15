@@ -4,8 +4,12 @@ import "testing"
 
 func TestDefine(t *testing.T) {
 	expected := map[string]Symbol{
-		"a": Symbol{Name: "a", Scope: GlobalScope, Index: 0},
-		"b": Symbol{Name: "b", Scope: GlobalScope, Index: 1},
+		"a": {Name: "a", Scope: GlobalScope, Index: 0},
+		"b": {Name: "b", Scope: GlobalScope, Index: 1},
+		"c": {Name: "c", Scope: LocalScope, Index: 0},
+		"d": {Name: "d", Scope: LocalScope, Index: 1},
+		"e": {Name: "e", Scope: LocalScope, Index: 0},
+		"f": {Name: "f", Scope: LocalScope, Index: 1},
 	}
 
 	global := NewSymbolTable()
@@ -19,6 +23,28 @@ func TestDefine(t *testing.T) {
 	if b != expected["b"] {
 		t.Errorf("expected b=%+v, got=%+v", expected["b"], a)
 	}
+
+	firstLocal := NewEnclosedSymbolTable(global)
+	c := firstLocal.Define("c")
+	if c != expected["c"] {
+		t.Errorf("expected c=%+v, got=%+v", expected["c"], a)
+	}
+
+	d := firstLocal.Define("d")
+	if d != expected["d"] {
+		t.Errorf("expected d=%+v, got=%+v", expected["d"], a)
+	}
+
+	secondLocal := NewEnclosedSymbolTable(firstLocal)
+	e := secondLocal.Define("e")
+	if e != expected["e"] {
+		t.Errorf("expected e=%+v, got=%+v", expected["c"], a)
+	}
+
+	f := secondLocal.Define("f")
+	if f != expected["f"] {
+		t.Errorf("expected f=%+v, got=%+v", expected["d"], a)
+	}
 }
 
 func TestResolveGlobal(t *testing.T) {
@@ -27,12 +53,40 @@ func TestResolveGlobal(t *testing.T) {
 	global.Define("b")
 
 	expected := []Symbol{
-		Symbol{Name: "a", Scope: GlobalScope, Index: 0},
-		Symbol{Name: "b", Scope: GlobalScope, Index: 1},
+		{Name: "a", Scope: GlobalScope, Index: 0},
+		{Name: "b", Scope: GlobalScope, Index: 1},
 	}
 
 	for _, sym := range expected {
 		result, ok := global.Resolve(sym.Name)
+		if !ok {
+			t.Errorf("name %s not resolvable", sym.Name)
+		}
+
+		if result != sym {
+			t.Errorf("expected %s to resolve to %+v, got=%+v", sym.Name, sym, result)
+		}
+	}
+}
+
+func TestResolveLocal(t *testing.T) {
+	global := NewSymbolTable()
+	global.Define("a")
+	global.Define("b")
+
+	local := NewEnclosedSymbolTable(global)
+	local.Define("c")
+	local.Define("d")
+
+	expected := []Symbol{
+		{Name: "a", Scope: GlobalScope, Index: 0},
+		{Name: "b", Scope: GlobalScope, Index: 1},
+		{Name: "c", Scope: LocalScope, Index: 0},
+		{Name: "d", Scope: LocalScope, Index: 1},
+	}
+
+	for _, sym := range expected {
+		result, ok := local.Resolve(sym.Name)
 		if !ok {
 			t.Errorf("name %s not resolvable", sym.Name)
 		}
