@@ -1,8 +1,6 @@
 package object
 
-import (
-	"fmt"
-)
+import "fmt"
 
 var BuiltIns = []struct {
 	Name    string
@@ -12,7 +10,8 @@ var BuiltIns = []struct {
 		"len",
 		&BuiltIn{Fn: func(args ...Object) Object {
 			if len(args) != 1 {
-				return newError("wrong number of arguments. got=%d, want=1", len(args))
+				return newError("wrong number of arguments. got=%d, want=1",
+					len(args))
 			}
 
 			switch arg := args[0].(type) {
@@ -21,7 +20,8 @@ var BuiltIns = []struct {
 			case *String:
 				return &Integer{Value: int64(len(arg.Value))}
 			default:
-				return newError("argument to `len` not supported, got %s", args[0].Type())
+				return newError("argument to `len` not supported, got %s",
+					args[0].Type())
 			}
 		},
 		},
@@ -34,7 +34,8 @@ var BuiltIns = []struct {
 			}
 
 			return nil
-		}},
+		},
+		},
 	},
 	{
 		"first",
@@ -54,7 +55,8 @@ var BuiltIns = []struct {
 			}
 
 			return nil
-		}},
+		},
+		},
 	},
 	{
 		"last",
@@ -64,18 +66,19 @@ var BuiltIns = []struct {
 					len(args))
 			}
 			if args[0].Type() != ARRAY_OBJ {
-				return newError("argument to `first` must be ARRAY, got %s",
+				return newError("argument to `last` must be ARRAY, got %s",
 					args[0].Type())
 			}
 
 			arr := args[0].(*Array)
 			length := len(arr.Elements)
-			if len(arr.Elements) > 0 {
+			if length > 0 {
 				return arr.Elements[length-1]
 			}
 
 			return nil
-		}},
+		},
+		},
 	},
 	{
 		"rest",
@@ -98,17 +101,18 @@ var BuiltIns = []struct {
 			}
 
 			return nil
-		}},
+		},
+		},
 	},
 	{
 		"push",
 		&BuiltIn{Fn: func(args ...Object) Object {
-			if len(args) != 1 {
-				return newError("wrong number of arguments. got=%d, want=1",
+			if len(args) != 2 {
+				return newError("wrong number of arguments. got=%d, want=2",
 					len(args))
 			}
 			if args[0].Type() != ARRAY_OBJ {
-				return newError("argument to `rest` must be ARRAY, got %s",
+				return newError("argument to `push` must be ARRAY, got %s",
 					args[0].Type())
 			}
 
@@ -120,19 +124,20 @@ var BuiltIns = []struct {
 			newElements[length] = args[1]
 
 			return &Array{Elements: newElements}
-		}},
+		},
+		},
 	},
 }
 
-func GetBuiltinByName(name string) *BuiltIn {
+func newError(format string, a ...interface{}) *Error {
+	return &Error{Message: fmt.Sprintf(format, a...)}
+}
+
+func GetBuiltInByName(name string) *BuiltIn {
 	for _, def := range BuiltIns {
 		if def.Name == name {
 			return def.BuiltIn
 		}
 	}
 	return nil
-}
-
-func newError(format string, a ...interface{}) *Error {
-	return &Error{Message: fmt.Sprintf(format, a...)}
 }

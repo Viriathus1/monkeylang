@@ -18,6 +18,9 @@ func Start(in io.Reader, out io.Writer) {
 
 	constants := []object.Object{}
 	symbolTable := compiler.NewSymbolTable()
+	for i, v := range object.BuiltIns {
+		symbolTable.DefineBuiltin(i, v.Name)
+	}
 	globals := make([]object.Object, vm.GlobalSize)
 
 	for {
